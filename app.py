@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (NUCLEAR AM/PM FIX + REAL MAP)
+# app.py - Vizag Traffic Predictor (FINAL - COMPLETE WITH MAP HEADING)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -254,7 +254,7 @@ with col3:
     time_display = f"{hour_12:02d}:{minute:02d} {am_pm}"
 
 # ==========================================
-# 🗺️  REAL GOOGLE MAPS EMBED
+# 🗺️  REAL GOOGLE MAPS EMBED (HEADING VISIBLE)
 # ==========================================
 lat, lon = vizag_locations[location]
 google_maps_src = f"https://maps.google.com/maps?q={lat},{lon}&z=15&output=embed&hl=en"
@@ -268,10 +268,11 @@ embed_html = f"""
         src="{google_maps_src}" 
         allowfullscreen>
     </iframe>
-    <p style="font-size: 0.8rem; color: #888; text-align: center;">📍 Live location: <b>{location}</b>, Visakhapatnam</p>
+    <p style="font-size: 0.8rem; color: #555; text-align: center; margin-top: 0.25rem;">📍 <b>{location}</b>, Visakhapatnam</p>
 """
 
-st.caption("📍 Live Map Location")
+# --- UPDATED: VISIBLE MAP HEADING ---
+st.markdown("<h4 style='color:#1e3c72; font-weight:700; margin-top: 0.5rem;'>📍 Live Map Location</h4>", unsafe_allow_html=True)
 st.components.v1.html(embed_html, height=470)
 
 # --- WEATHER SECTION ---

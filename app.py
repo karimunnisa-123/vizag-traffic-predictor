@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (BLACK HEADINGS & LABELS)
+# app.py - Vizag Traffic Predictor (FIXED: Boxes + Black AM/PM)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,31 +13,43 @@ from sklearn.ensemble import RandomForestRegressor
 
 st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
 
-# --- CSS: FORCE ALL HEADINGS & LABELS TO BLACK ---
+# --- CSS: BLACK HEADINGS + BLACK AM/PM + VISIBLE LABELS ---
 st.markdown("""
 <style>
     .stApp { background-color: #ffffff; }
     
-    /* 1. FORCE ALL SUBHEADINGS AND HEADINGS TO BLACK */
+    /* 1. FORCE ALL HEADINGS TO BLACK */
     h1, h2, h3, h4, .stSubheader, .stHeading {
         color: #000000 !important;
         font-weight: 700 !important;
     }
     
-    /* 2. FORCE ALL WIDGET LABELS (Location, Temp, etc.) TO BLACK */
+    /* 2. FORCE ALL WIDGET LABELS TO BLACK */
     .stSelectbox label, .stNumberInput label, .stSlider label, 
-    .stRadio label, .stCheckbox label, .stDateInput label {
+    .stDateInput label, .stCheckbox label {
         color: #000000 !important;
         font-weight: 600 !important;
     }
     
-    /* 3. FORCE CAPTIONS (Detected Day, Selected Time) TO BLACK */
+    /* 3. FORCE AM/PM RADIO BUTTONS TO BLACK (THE FIX) */
+    .stRadio label {
+        color: #000000 !important;
+        font-weight: 600 !important;
+    }
+    .stRadio div[role="radiogroup"] label {
+        color: #000000 !important;
+    }
+    div[role="radiogroup"] label span {
+        color: #000000 !important;
+    }
+    
+    /* 4. CAPTIONS TO BLACK */
     .stCaption, .st-caption {
         color: #000000 !important;
         font-weight: 500 !important;
     }
 
-    /* 4. MAIN HEADER (Blue Gradient - Keep as is) */
+    /* 5. MAIN HEADER (BLUE GRADIENT) */
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -49,7 +61,7 @@ st.markdown("""
     .main-header h1 { color: white !important; }
     .main-header p { color: white !important; }
     
-    /* 5. TRAFFIC CARDS */
+    /* 6. TRAFFIC CARDS */
     .traffic-card {
         padding: 1rem;
         border-radius: 15px;
@@ -61,7 +73,7 @@ st.markdown("""
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
     
-    /* 6. PREDICT BUTTON (Clean Blue) */
+    /* 7. CLEAN PREDICT BUTTON */
     div.stButton > button {
         background: linear-gradient(90deg, #1e3c72, #2a5298) !important;
         color: #ffffff !important;
@@ -264,19 +276,35 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
         st.markdown("---")
         st.subheader("📊 Prediction Results")
         
+        # --- FIX 1: STYLED BOXES FOR VEHICLES AND SPEED (RESTORED) ---
         m1, m2, m3 = st.columns(3)
+        
         with m1: 
-            st.metric("🚗 Predicted Vehicle Count", f"{pred_count} vehicles")
-        with m2: 
-            st.metric("📏 Estimated Avg. Speed", f"{speed} km/h")
-        with m3:
             st.markdown(f"""
-            <div class="traffic-card {color_class}">
-                <div style="font-size: 2.2rem; color: #000;">{level}</div>
-                <div style="font-size: 1rem; font-weight: bold; color: #000;">Traffic Level</div>
+            <div style='background:#f0f4f8; padding:1rem; border-radius:10px; border:1px solid #d0d8e0; text-align:center;'>
+                <div style='color:#000000; font-size:0.9rem; font-weight:600;'>🚗 Predicted Vehicle Count</div>
+                <div style='color:#000000; font-size:2.2rem; font-weight:700;'>{pred_count} vehicles</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with m2:
+            st.markdown(f"""
+            <div style='background:#f0f4f8; padding:1rem; border-radius:10px; border:1px solid #d0d8e0; text-align:center;'>
+                <div style='color:#000000; font-size:0.9rem; font-weight:600;'>📏 Estimated Avg. Speed</div>
+                <div style='color:#000000; font-size:2.2rem; font-weight:700;'>{speed} km/h</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with m3:
+            bg_color = "#ffcccc" if "HIGH" in level else "#ffe5b4" if "MEDIUM" in level else "#d4edda"
+            st.markdown(f"""
+            <div style='background:{bg_color}; padding:1rem; border-radius:10px; border-left:8px solid {"#dc3545" if "HIGH" in level else "#fd7e14" if "MEDIUM" in level else "#28a745"}; text-align:center;'>
+                <div style='color:#000000; font-size:2.2rem; font-weight:700;'>{level}</div>
+                <div style='color:#000000; font-size:1rem; font-weight:600;'>Traffic Level</div>
             </div>
             """, unsafe_allow_html=True)
 
+        # Expected Congestion
         st.markdown(f"""
         <div style="background: #e9ecef; padding: 1rem; border-radius: 10px; margin: 1rem 0; color: #000;">
             <b>⏳ Expected Congestion:</b> {congestion}
@@ -295,6 +323,7 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
 
         st.dataframe(result_df, use_container_width=True, hide_index=True)
 
+        # GAUGE
         fig = go.Figure(go.Indicator(
             mode="gauge+number", value=pred_count, domain={'x': [0, 1], 'y': [0, 1]},
             title={'text': "🚦 Traffic Volume Gauge"},

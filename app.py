@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (FIXED: Boxes + Black AM/PM)
+# app.py - Vizag Traffic Predictor (FIXED: AM/PM Visible)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,7 +13,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
 
-# --- CSS: BLACK HEADINGS + BLACK AM/PM + VISIBLE LABELS ---
+# --- CSS: BLACK HEADINGS + ULTRA STRONG AM/PM FIX ---
 st.markdown("""
 <style>
     .stApp { background-color: #ffffff; }
@@ -32,26 +32,25 @@ st.markdown("""
     }
     
     /* 3. FORCE AM/PM RADIO BUTTONS TO BLACK (ULTRA STRONG) */
-.stRadio label {
-    color: #000000 !important;
-    font-weight: 600 !important;
-}
-.stRadio div[role="radiogroup"] label {
-    color: #000000 !important;
-}
-div[role="radiogroup"] label span {
-    color: #000000 !important;
-}
-.stRadio label span {
-    color: #000000 !important;
-}
-.stRadio span {
-    color: #000000 !important;
-}
-/* Force the selected text too */
-.stRadio label[data-checked="true"] span {
-    color: #000000 !important;
-}
+    .stRadio label {
+        color: #000000 !important;
+        font-weight: 600 !important;
+    }
+    .stRadio div[role="radiogroup"] label {
+        color: #000000 !important;
+    }
+    div[role="radiogroup"] label span {
+        color: #000000 !important;
+    }
+    .stRadio label span {
+        color: #000000 !important;
+    }
+    .stRadio span {
+        color: #000000 !important;
+    }
+    .stRadio label[data-checked="true"] span {
+        color: #000000 !important;
+    }
     
     /* 4. CAPTIONS TO BLACK */
     .stCaption, .st-caption {
@@ -286,9 +285,7 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
         st.markdown("---")
         st.subheader("📊 Prediction Results")
         
-        # --- FIX 1: STYLED BOXES FOR VEHICLES AND SPEED (RESTORED) ---
         m1, m2, m3 = st.columns(3)
-        
         with m1: 
             st.markdown(f"""
             <div style='background:#f0f4f8; padding:1rem; border-radius:10px; border:1px solid #d0d8e0; text-align:center;'>
@@ -314,7 +311,6 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
             </div>
             """, unsafe_allow_html=True)
 
-        # Expected Congestion
         st.markdown(f"""
         <div style="background: #e9ecef; padding: 1rem; border-radius: 10px; margin: 1rem 0; color: #000;">
             <b>⏳ Expected Congestion:</b> {congestion}
@@ -333,7 +329,6 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
 
         st.dataframe(result_df, use_container_width=True, hide_index=True)
 
-        # GAUGE
         fig = go.Figure(go.Indicator(
             mode="gauge+number", value=pred_count, domain={'x': [0, 1], 'y': [0, 1]},
             title={'text': "🚦 Traffic Volume Gauge"},

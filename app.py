@@ -5,7 +5,15 @@ import numpy as np
 import pickle
 from datetime import datetime
 import plotly.graph_objects as go
+import os
+import subprocess
 
+# --- AUTO-BUILD MODELS IF MISSING (FOR STREAMLIT CLOUD) ---
+if not os.path.exists('traffic_model.pkl'):
+    st.warning("⚙️ First time setup! Training the Vizag model on the cloud... (~60 seconds)")
+    subprocess.run(['python', 'train_model.py'], check=True)
+    st.success("✅ Model ready! Refreshing...")
+    st.rerun()
 # --- Page Configuration ---
 st.set_page_config(
     page_title="🚦 Vizag Traffic Predictor",

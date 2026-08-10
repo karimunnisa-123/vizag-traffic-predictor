@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (CLEAN UI, FIXED VISIBILITY)
+# app.py - Vizag Traffic Predictor (WIDER LAYOUT, FULL LABELS)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -18,14 +18,10 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- CLEAN, SAFE CUSTOM CSS (Does NOT hide Streamlit widgets) ---
+# --- SAFE CSS (Only Header & Cards) ---
 st.markdown("""
 <style>
-    /* Force white background for the whole app */
-    .stApp {
-        background-color: #ffffff;
-    }
-    /* Custom Header */
+    .stApp { background-color: #ffffff; }
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -34,7 +30,6 @@ st.markdown("""
         color: white;
         margin-bottom: 2rem;
     }
-    /* Traffic Level Cards */
     .traffic-card {
         padding: 1rem;
         border-radius: 15px;
@@ -45,6 +40,12 @@ st.markdown("""
     .high-risk { background-color: #ffcccc; border-left: 8px solid #dc3545; }
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
+    /* Ensure labels are always visible */
+    .stSlider label, .stNumberInput label, .stSelectbox label, .stRadio label {
+        font-weight: 500 !important;
+        color: #1e3c72 !important;
+        font-size: 0.95rem !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -168,21 +169,21 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- 6. INPUT SECTION ---
+# --- 6. INPUT SECTION (WIDER GAPS FOR BETTER VISIBILITY) ---
 st.subheader("📍 Select Location, Date & Time")
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
-    location = st.selectbox("Location", ["Gajuwaka", "NAD Junction", "Maddilapalem", "Siripuram", 
-                                         "MVP Colony", "Dwaraka Nagar", "RTC Complex", 
-                                         "Jagadamba Junction", "Akkayyapalem", "Madhurawada"])
+    location = st.selectbox("📍 Location", ["Gajuwaka", "NAD Junction", "Maddilapalem", "Siripuram", 
+                                             "MVP Colony", "Dwaraka Nagar", "RTC Complex", 
+                                             "Jagadamba Junction", "Akkayyapalem", "Madhurawada"])
 with col2:
-    date = st.date_input("Date", datetime.now())
+    date = st.date_input("📅 Date", datetime.now())
     day = date.strftime('%A')
     st.caption(f"📅 Detected Day: **{day}**")
 with col3:
     st.write("⏰ Select Time")
-    time_col1, time_col2, time_col3 = st.columns(3)
+    time_col1, time_col2, time_col3 = st.columns(3, gap="small")
     with time_col1: hour_12 = st.selectbox("Hour", list(range(1, 13)), index=8)
     with time_col2: minute = st.selectbox("Min", [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], index=0)
     with time_col3: am_pm = st.radio("Period", ["AM", "PM"], index=0)
@@ -193,11 +194,16 @@ with col3:
     time_display = f"{hour_12:02d}:{minute:02d} {am_pm}"
 
 st.subheader("🌦️ Weather & Historical Traffic")
-col4, col5, col6, col7 = st.columns(4)
-with col4: temperature = st.slider("🌡️ Temperature (°C)", 20, 40, 30)
-with col5: rainfall = st.slider("🌧️ Rainfall (mm)", 0.0, 50.0, 5.0, step=0.5)
-with col6: prev_traffic = st.number_input("🚗 Traffic (1 hour ago)", min_value=50, max_value=1200, value=400)
-with col7: prev_hour_traffic = st.number_input("🔄 Traffic (2 hours ago)", min_value=50, max_value=1200, value=380)
+col4, col5, col6, col7 = st.columns(4, gap="large")
+
+with col4: 
+    temperature = st.slider("🌡️ Temperature (°C)", 20, 40, 30, use_container_width=True)
+with col5: 
+    rainfall = st.slider("🌧️ Rainfall (mm)", 0.0, 50.0, 5.0, step=0.5, use_container_width=True)
+with col6: 
+    prev_traffic = st.number_input("🚗 Traffic (1 hour ago)", min_value=50, max_value=1200, value=400, use_container_width=True)
+with col7: 
+    prev_hour_traffic = st.number_input("🔄 Traffic (2 hours ago)", min_value=50, max_value=1200, value=380, use_container_width=True)
 
 is_holiday = st.checkbox("🏖️ Is today a Public Holiday?")
 st.markdown("---")

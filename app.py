@@ -1,4 +1,4 @@
-# app.py - Complete Vizag Traffic Predictor (Self-Contained for Cloud)
+# app.py - Complete Vizag Traffic Predictor (Cloud-Ready, No matplotlib)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -12,11 +12,27 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 
 # --- PAGE CONFIG ---
-st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
+st.set_page_config(
+    page_title="🚦 Vizag Traffic Predictor",
+    page_icon="🚦",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-# --- CUSTOM CSS ---
+# --- FORCE LIGHT THEME (Fixes Black Background on Cloud) ---
 st.markdown("""
 <style>
+    .stApp { background-color: #ffffff; }
+    .st-bb, .st-at { background-color: #f0f2f6; }
+    div[data-testid="stDataFrame"] { background-color: #ffffff; }
+    .st-cb { background-color: #ffffff; }
+    .st-dc { background-color: #ffffff; }
+    .st-bx { background-color: #ffffff; }
+    .st-ae { background-color: #ffffff; }
+    .st-cd { background-color: #ffffff; }
+    .st-df { background-color: #ffffff; }
+    [data-testid="stAppViewContainer"] { background-color: #ffffff; }
+    [data-testid="stHeader"] { background-color: #ffffff; }
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -242,8 +258,23 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
             "Holiday": "Yes" if is_holiday else "No",
             "Traffic (1 hour ago)": prev_traffic, "Traffic (2 hours ago)": prev_hour_traffic
         }])
-        st.dataframe(result_df.style.background_gradient(cmap='Blues', subset=['Vehicle count']), use_container_width=True, hide_index=True)
+        
+        # --- FIX: No matplotlib needed! Uses native BarColumn ---
+        st.dataframe(
+            result_df,
+            column_config={
+                "Vehicle count": st.column_config.BarColumn(
+                    "Vehicle Count",
+                    min_value=0,
+                    max_value=1000,
+                    width="medium",
+                )
+            },
+            use_container_width=True,
+            hide_index=True
+        )
 
+        # --- Plotly Gauge ---
         fig = go.Figure(go.Indicator(
             mode="gauge+number", value=pred_count, domain={'x': [0, 1], 'y': [0, 1]},
             title={'text': "🚦 Traffic Volume Gauge"},

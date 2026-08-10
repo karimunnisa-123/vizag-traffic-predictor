@@ -1,12 +1,12 @@
-# app.py - Vizag Traffic Predictor (Self-contained, no subprocess, no matplotlib)
+# app.py - Vizag Traffic Predictor (Cloud-Tested)
 import streamlit as st
 import pandas as pd
 import numpy as np
 import pickle
-from datetime import datetime, timedelta
-import plotly.graph_objects as go
 import os
 import random
+from datetime import datetime, timedelta
+import plotly.graph_objects as go
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.ensemble import RandomForestRegressor
@@ -35,11 +35,6 @@ st.markdown("""
     .high-risk { background-color: #ffcccc; border-left: 8px solid #dc3545; }
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
-    .stSlider label, .stNumberInput label, .stSelectbox label, .stRadio label {
-        font-weight: 500 !important;
-        color: #1e3c72 !important;
-        font-size: 0.95rem !important;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -136,7 +131,7 @@ def train_vizag_model():
     pickle.dump(features, open('feature_names.pkl', 'wb'))
     return model
 
-# ---------- AUTO-BUILD (no subprocess) ----------
+# ---------- AUTO-BUILD ----------
 if not os.path.exists('traffic_model.pkl'):
     st.warning("⚙️ First time setup! Generating Vizag data and training model... (~2 minutes)")
     generate_vizag_data()
@@ -155,7 +150,7 @@ def load_models():
 
 model, scaler, encoders, features = load_models()
 
-# ---------- UI ----------
+# ---------- HEADER ----------
 st.markdown("""
 <div class="main-header">
     <h1>🚦 Location & Time-Based Traffic Congestion Prediction</h1>
@@ -163,6 +158,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ---------- INPUTS ----------
 st.subheader("📍 Select Location, Date & Time")
 col1, col2, col3 = st.columns(3, gap="large")
 
@@ -188,6 +184,8 @@ with col3:
 
 st.subheader("🌦️ Weather & Historical Traffic")
 col4, col5, col6, col7 = st.columns(4, gap="large")
+
+# --- SIMPLE, CLOUD-FRIENDLY SYNTAX (no 'with' and no use_container_width) ---
 temperature = col4.slider("🌡️ Temperature (°C)", 20, 40, 30)
 rainfall = col5.slider("🌧️ Rainfall (mm)", 0.0, 50.0, 5.0, step=0.5)
 prev_traffic = col6.number_input("🚗 Traffic (1 hour ago)", min_value=50, max_value=1200, value=400)
@@ -196,6 +194,7 @@ prev_hour_traffic = col7.number_input("🔄 Traffic (2 hours ago)", min_value=50
 is_holiday = st.checkbox("🏖️ Is today a Public Holiday?")
 st.markdown("---")
 
+# ---------- PREDICTION ----------
 if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary"):
     with st.spinner("🔍 Analyzing real-time Vizag traffic patterns..."):
         loc_encoded = encoders['Location'].transform([location])[0]
@@ -246,7 +245,6 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
             "Traffic (1 hour ago)": prev_traffic, "Traffic (2 hours ago)": prev_hour_traffic
         }])
 
-        # ✅ NO matplotlib – uses native BarColumn
         st.dataframe(
             result_df,
             column_config={

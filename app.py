@@ -31,17 +31,27 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* 3. FORCE AM/PM RADIO BUTTONS TO BLACK (THE FIX) */
-    .stRadio label {
-        color: #000000 !important;
-        font-weight: 600 !important;
-    }
-    .stRadio div[role="radiogroup"] label {
-        color: #000000 !important;
-    }
-    div[role="radiogroup"] label span {
-        color: #000000 !important;
-    }
+    /* 3. FORCE AM/PM RADIO BUTTONS TO BLACK (ULTRA STRONG) */
+.stRadio label {
+    color: #000000 !important;
+    font-weight: 600 !important;
+}
+.stRadio div[role="radiogroup"] label {
+    color: #000000 !important;
+}
+div[role="radiogroup"] label span {
+    color: #000000 !important;
+}
+.stRadio label span {
+    color: #000000 !important;
+}
+.stRadio span {
+    color: #000000 !important;
+}
+/* Force the selected text too */
+.stRadio label[data-checked="true"] span {
+    color: #000000 !important;
+}
     
     /* 4. CAPTIONS TO BLACK */
     .stCaption, .st-caption {

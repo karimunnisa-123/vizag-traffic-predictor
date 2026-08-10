@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (NEON BUTTON + VISIBLE HEADINGS)
+# app.py - Vizag Traffic Predictor (CLEAN BUTTON + VISIBLE HEADINGS)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,7 +13,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
 
-# --- CSS: NEON BUTTON + VISIBLE HEADINGS + CLEAN UI ---
+# --- CSS: CLEAN BUTTON + VISIBLE HEADINGS ---
 st.markdown("""
 <style>
     .stApp { background-color: #ffffff; }
@@ -48,24 +48,23 @@ st.markdown("""
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
     
-    /* --- NEON BUTTON STYLES --- */
+    /* --- CLEAN PREDICT BUTTON (No Neon) --- */
     div.stButton > button {
-        background-color: #00ffcc !important;
-        color: #000000 !important;
-        font-weight: 800 !important;
+        background: linear-gradient(90deg, #1e3c72, #2a5298) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
         font-size: 1.2rem !important;
-        border: 2px solid #00ffcc !important;
+        border: none !important;
         border-radius: 30px !important;
-        padding: 0.6rem 2rem !important;
-        box-shadow: 0 0 10px #00ffcc, 0 0 30px #00ffcc, 0 0 60px #00ffcc !important;
+        padding: 0.7rem 2rem !important;
         transition: all 0.3s ease !important;
         width: 100% !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
     }
     div.stButton > button:hover {
-        background-color: #00e6b8 !important;
-        box-shadow: 0 0 15px #00ffcc, 0 0 45px #00ffcc, 0 0 80px #00ffcc !important;
+        background: linear-gradient(90deg, #2a5298, #1e3c72) !important;
         transform: scale(1.02) !important;
-        border-color: #00e6b8 !important;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.3) !important;
     }
     div.stButton > button:active {
         transform: scale(0.98) !important;
@@ -193,22 +192,22 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ---------- INPUTS (Using custom HTML to force visibility) ----------
+# ---------- INPUTS (Using custom HTML for visible headings) ----------
 
 # --- Heading 1 ---
 st.markdown("<h3 style='color:#1e3c72; font-weight:700;'>📍 Select Location, Date & Time</h3>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
-    location = st.selectbox("📍 Location", ["Gajuwaka", "NAD Junction", "Maddilapalem", "Siripuram", 
-                                             "MVP Colony", "Dwaraka Nagar", "RTC Complex", 
-                                             "Jagadamba Junction", "Akkayyapalem", "Madhurawada"])
+    location = st.selectbox("Location", ["Gajuwaka", "NAD Junction", "Maddilapalem", "Siripuram", 
+                                          "MVP Colony", "Dwaraka Nagar", "RTC Complex", 
+                                          "Jagadamba Junction", "Akkayyapalem", "Madhurawada"])
 with col2:
-    date = st.date_input("📅 Date", datetime.now())
+    date = st.date_input("Date", datetime.now())
     day = date.strftime('%A')
-    st.caption(f"📅 Detected Day: **{day}**")
+    st.caption(f"Detected Day: **{day}**")
 with col3:
-    st.write("⏰ Select Time")
+    st.write("Select Time")
     time_col1, time_col2, time_col3 = st.columns(3, gap="small")
     with time_col1: hour_12 = st.selectbox("Hour", list(range(1, 13)), index=8)
     with time_col2: minute = st.selectbox("Min", [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], index=0)
@@ -216,23 +215,22 @@ with col3:
     if am_pm == "PM" and hour_12 != 12: hour = hour_12 + 12
     elif am_pm == "AM" and hour_12 == 12: hour = 0
     else: hour = hour_12
-    st.caption(f"✅ Selected Time: {hour_12:02d}:{minute:02d} {am_pm}")
+    st.caption(f"Selected Time: {hour_12:02d}:{minute:02d} {am_pm}")
     time_display = f"{hour_12:02d}:{minute:02d} {am_pm}"
 
 # --- Heading 2 ---
 st.markdown("<h3 style='color:#1e3c72; font-weight:700;'>🌦️ Weather & Historical Traffic</h3>", unsafe_allow_html=True)
 col4, col5, col6, col7 = st.columns(4, gap="large")
 
-temperature = col4.slider("🌡️ Temperature (°C)", 20, 40, 30)
-rainfall = col5.slider("🌧️ Rainfall (mm)", 0.0, 50.0, 5.0, step=0.5)
-prev_traffic = col6.number_input("🚗 Traffic (1 hour ago)", min_value=50, max_value=1200, value=400)
-prev_hour_traffic = col7.number_input("🔄 Traffic (2 hours ago)", min_value=50, max_value=1200, value=380)
+temperature = col4.slider("Temperature (°C)", 20, 40, 30)
+rainfall = col5.slider("Rainfall (mm)", 0.0, 50.0, 5.0, step=0.5)
+prev_traffic = col6.number_input("Traffic (1 hour ago)", min_value=50, max_value=1200, value=400)
+prev_hour_traffic = col7.number_input("Traffic (2 hours ago)", min_value=50, max_value=1200, value=380)
 
-is_holiday = st.checkbox("🏖️ Is today a Public Holiday?")
+is_holiday = st.checkbox("Is today a Public Holiday?")
 st.markdown("---")
 
-# ---------- PREDICTION (With NEON BUTTON) ----------
-# The button is styled via CSS now, no changes needed here except removing type="primary" to let custom CSS shine, but keeping it won't hurt.
+# ---------- PREDICTION (Clean Button) ----------
 if st.button("🔮 Predict Traffic Now", use_container_width=True):
     with st.spinner("🔍 Analyzing real-time Vizag traffic patterns..."):
         loc_encoded = encoders['Location'].transform([location])[0]
@@ -285,7 +283,7 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True):
             </div>
             """, unsafe_allow_html=True)
 
-        # --- Expected Congestion (Visible) ---
+        # --- Expected Congestion ---
         st.markdown(f"""
         <div style='
             background: #d4dce4; 

@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (FIXED: AM/PM Visible)
+# app.py - Vizag Traffic Predictor (FORCED LIGHT MODE + BLACK AM/PM)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -11,54 +11,79 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 
-st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
+# --- CRITICAL FIX: Force the app to use LIGHT THEME ---
+st.set_page_config(
+    page_title="🚦 Vizag Traffic Predictor",
+    page_icon="🚦",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+    menu_items=None
+)
 
-# --- CSS: BLACK HEADINGS + ULTRA STRONG AM/PM FIX ---
+# --- CSS: BLOCK DARK MODE & FORCE BLACK AM/PM ---
 st.markdown("""
 <style>
-    .stApp { background-color: #ffffff; }
+    /* 1. FORCE THE ENTIRE APP BACKGROUND TO WHITE */
+    .stApp {
+        background-color: #ffffff !important;
+    }
     
-    /* 1. FORCE ALL HEADINGS TO BLACK */
-    h1, h2, h3, h4, .stSubheader, .stHeading {
+    /* 2. FORCE ALL BODY TEXT AND CONTAINERS TO BLACK */
+    html, body, .main, .st-bb, .st-at, .st-cb, .st-dc, .st-bx, .st-ae {
+        color: #000000 !important;
+        background-color: #ffffff !important;
+    }
+    
+    /* 3. FORCE HEADINGS TO BLACK */
+    h1, h2, h3, h4, .stSubheader {
         color: #000000 !important;
         font-weight: 700 !important;
     }
     
-    /* 2. FORCE ALL WIDGET LABELS TO BLACK */
+    /* 4. FORCE ALL WIDGET LABELS TO BLACK */
     .stSelectbox label, .stNumberInput label, .stSlider label, 
-    .stDateInput label, .stCheckbox label {
+    .stDateInput label, .stCheckbox label, .stRadio label {
         color: #000000 !important;
         font-weight: 600 !important;
     }
     
-    /* 3. FORCE AM/PM RADIO BUTTONS TO BLACK (ULTRA STRONG) */
+    /* 5. THE MEGA FIX: FORCE AM/PM RADIO TEXT TO BLACK */
+    .stRadio > div[role="radiogroup"] label {
+        color: #000000 !important;
+        font-weight: 600 !important;
+    }
+    .stRadio > div[role="radiogroup"] label span {
+        color: #000000 !important;
+    }
+    .stRadio > div[role="radiogroup"] label div {
+        color: #000000 !important;
+    }
+    .stRadio > div[role="radiogroup"] label p {
+        color: #000000 !important;
+    }
+    /* Target the checked/selected state */
+    .stRadio > div[role="radiogroup"] label[data-checked="true"] {
+        color: #000000 !important;
+    }
+    .stRadio > div[role="radiogroup"] label[data-checked="true"] span {
+        color: #000000 !important;
+    }
+    /* Target the radio circle parent */
+    .stRadio > div[role="radiogroup"] {
+        color: #000000 !important;
+    }
+    /* A final blanket override for the entire radio group */
     .stRadio label {
         color: #000000 !important;
-        font-weight: 600 !important;
-    }
-    .stRadio div[role="radiogroup"] label {
-        color: #000000 !important;
-    }
-    div[role="radiogroup"] label span {
-        color: #000000 !important;
-    }
-    .stRadio label span {
-        color: #000000 !important;
-    }
-    .stRadio span {
-        color: #000000 !important;
-    }
-    .stRadio label[data-checked="true"] span {
-        color: #000000 !important;
     }
     
-    /* 4. CAPTIONS TO BLACK */
+    /* 6. CAPTIONS TO BLACK */
     .stCaption, .st-caption {
         color: #000000 !important;
         font-weight: 500 !important;
     }
 
-    /* 5. MAIN HEADER (BLUE GRADIENT) */
+    /* 7. MAIN HEADER (BLUE GRADIENT) */
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -70,7 +95,7 @@ st.markdown("""
     .main-header h1 { color: white !important; }
     .main-header p { color: white !important; }
     
-    /* 6. TRAFFIC CARDS */
+    /* 8. TRAFFIC CARDS */
     .traffic-card {
         padding: 1rem;
         border-radius: 15px;
@@ -82,7 +107,7 @@ st.markdown("""
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
     
-    /* 7. CLEAN PREDICT BUTTON */
+    /* 9. CLEAN PREDICT BUTTON */
     div.stButton > button {
         background: linear-gradient(90deg, #1e3c72, #2a5298) !important;
         color: #ffffff !important;

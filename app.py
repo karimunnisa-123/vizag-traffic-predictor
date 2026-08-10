@@ -1,4 +1,4 @@
-# app.py - Complete Vizag Traffic Predictor (Cloud-Ready, No matplotlib)
+# app.py - Vizag Traffic Predictor (CLEAN UI, FIXED VISIBILITY)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -15,24 +15,17 @@ from sklearn.ensemble import RandomForestRegressor
 st.set_page_config(
     page_title="🚦 Vizag Traffic Predictor",
     page_icon="🚦",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 
-# --- FORCE LIGHT THEME (Fixes Black Background on Cloud) ---
+# --- CLEAN, SAFE CUSTOM CSS (Does NOT hide Streamlit widgets) ---
 st.markdown("""
 <style>
-    .stApp { background-color: #ffffff; }
-    .st-bb, .st-at { background-color: #f0f2f6; }
-    div[data-testid="stDataFrame"] { background-color: #ffffff; }
-    .st-cb { background-color: #ffffff; }
-    .st-dc { background-color: #ffffff; }
-    .st-bx { background-color: #ffffff; }
-    .st-ae { background-color: #ffffff; }
-    .st-cd { background-color: #ffffff; }
-    .st-df { background-color: #ffffff; }
-    [data-testid="stAppViewContainer"] { background-color: #ffffff; }
-    [data-testid="stHeader"] { background-color: #ffffff; }
+    /* Force white background for the whole app */
+    .stApp {
+        background-color: #ffffff;
+    }
+    /* Custom Header */
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -41,6 +34,7 @@ st.markdown("""
         color: white;
         margin-bottom: 2rem;
     }
+    /* Traffic Level Cards */
     .traffic-card {
         padding: 1rem;
         border-radius: 15px;
@@ -54,7 +48,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 1. DATA GENERATION FUNCTION (Built-in) ---
+# --- 1. DATA GENERATION ---
 def generate_vizag_data():
     locations = {
         "Gajuwaka": 450, "NAD Junction": 420, "Maddilapalem": 380,
@@ -117,7 +111,7 @@ def generate_vizag_data():
     df.to_csv('vizag_traffic.csv', index=False)
     return df
 
-# --- 2. MODEL TRAINING FUNCTION (Built-in) ---
+# --- 2. MODEL TRAINING ---
 def train_vizag_model():
     df = pd.read_csv('vizag_traffic.csv')
     features = ['Location', 'Hour', 'Day', 'Is_Weekend', 'Is_Holiday', 
@@ -147,7 +141,7 @@ def train_vizag_model():
     pickle.dump(features, open('feature_names.pkl', 'wb'))
     return model
 
-# --- 3. AUTO-BUILD LOGIC (Runs on first launch) ---
+# --- 3. AUTO-BUILD ---
 if not os.path.exists('traffic_model.pkl'):
     st.warning("⚙️ First time setup! Generating Vizag data and training model... (~2 minutes)")
     generate_vizag_data()
@@ -259,7 +253,6 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
             "Traffic (1 hour ago)": prev_traffic, "Traffic (2 hours ago)": prev_hour_traffic
         }])
         
-        # --- FIX: No matplotlib needed! Uses native BarColumn ---
         st.dataframe(
             result_df,
             column_config={
@@ -274,7 +267,6 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
             hide_index=True
         )
 
-        # --- Plotly Gauge ---
         fig = go.Figure(go.Indicator(
             mode="gauge+number", value=pred_count, domain={'x': [0, 1], 'y': [0, 1]},
             title={'text': "🚦 Traffic Volume Gauge"},

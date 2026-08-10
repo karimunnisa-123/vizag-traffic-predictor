@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (FINAL - ALL TEXT VISIBLE)
+# app.py - Vizag Traffic Predictor (FINAL - Inline Styles for Guaranteed Visibility)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,58 +13,10 @@ from sklearn.ensemble import RandomForestRegressor
 
 st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
 
-# --- CSS: FORCES EVERYTHING TO BE VISIBLE ---
+# --- MINIMAL CSS (Only for backgrounds, no text color overrides) ---
 st.markdown("""
 <style>
-    .stApp { background-color: #ffffff !important; color: #000000 !important; }
-    .st-bb, .st-at, .st-cb, .st-dc, .st-bx, .st-ae, .st-af, .st-ag, 
-    .st-be, .st-bf, .st-bg, .st-bh, .st-bi, .st-bj, .st-bk, .st-bl,
-    .st-bm, .st-bn, .st-bo, .st-bp, .st-bq, .st-br, .st-bs, .st-bt,
-    div[data-testid="stVerticalBlock"], div[data-testid="stHorizontalBlock"],
-    section.main > div, .block-container {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
-    .stSelectbox > div[data-baseweb="select"] > div,
-    .stSelectbox > div > div {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border: 1px solid #ccc !important;
-    }
-    .stSelectbox label { color: #1e3c72 !important; font-weight: 600 !important; }
-    .stNumberInput > div > div > input,
-    .stNumberInput > div > div {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border: 1px solid #ccc !important;
-    }
-    .stNumberInput label { color: #1e3c72 !important; font-weight: 600 !important; }
-    .stDateInput > div > div > input {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border: 1px solid #ccc !important;
-    }
-    .stDateInput label { color: #1e3c72 !important; font-weight: 600 !important; }
-    .stSlider label { color: #1e3c72 !important; font-weight: 600 !important; }
-    .stSlider > div > div > div > div { background-color: #2a5298 !important; }
-    .stRadio label { color: #000000 !important; font-weight: 500 !important; }
-    .stRadio > div { background-color: transparent !important; }
-    .stCheckbox label { color: #1e3c72 !important; font-weight: 500 !important; }
-    div[data-testid="metric-container"] {
-        background-color: #f0f4f8 !important;
-        border-radius: 10px !important;
-        padding: 1rem !important;
-        border: 1px solid #d0d8e0 !important;
-    }
-    div[data-testid="metric-container"] label {
-        color: #1e3c72 !important;
-        font-weight: 600 !important;
-    }
-    div[data-testid="metric-container"] div[data-testid="metric-value"] {
-        color: #000000 !important;
-        font-weight: 700 !important;
-        font-size: 2rem !important;
-    }
+    .stApp { background-color: #ffffff; }
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -73,8 +25,6 @@ st.markdown("""
         color: white;
         margin-bottom: 2rem;
     }
-    .main-header h1 { color: white !important; }
-    .main-header p { color: white !important; }
     .traffic-card {
         padding: 1rem;
         border-radius: 15px;
@@ -85,24 +35,6 @@ st.markdown("""
     .high-risk { background-color: #ffcccc; border-left: 8px solid #dc3545; }
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
-    .stSubheader, .stCaption { color: #1e3c72 !important; }
-    .stSubheader { font-weight: 600 !important; }
-    .st-caption { color: #000000 !important; }
-    div[data-testid="stDataFrame"] { background-color: #ffffff !important; }
-    div[data-testid="stDataFrame"] table { color: #000000 !important; }
-    div[data-testid="stDataFrame"] th {
-        background-color: #e8edf3 !important;
-        color: #1e3c72 !important;
-        font-weight: 600 !important;
-    }
-    div[data-testid="stDataFrame"] td { color: #000000 !important; }
-    .stAlert { background-color: #e3f0fa !important; color: #000000 !important; }
-    div[data-baseweb="popover"] > div {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
-    div[data-baseweb="popover"] li { color: #000000 !important; }
-    div[data-baseweb="popover"] li:hover { background-color: #e0e8f0 !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -284,22 +216,49 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
         speed = max(5, round(speed - rainfall * 0.3, 1))
 
         st.markdown("---")
-        st.subheader("📊 Prediction Results")
+        
+        # --- PREDICTION RESULTS WITH INLINE STYLES (Guaranteed Visibility) ---
+        st.markdown("<h3 style='color:#1e3c72; font-weight:600;'>📊 Prediction Results</h3>", unsafe_allow_html=True)
+        
         m1, m2, m3 = st.columns(3)
-        with m1: st.metric("🚗 Predicted Vehicle Count", f"{pred_count} vehicles")
-        with m2: st.metric("📏 Estimated Avg. Speed", f"{speed} km/h")
-        with m3:
+        with m1: 
             st.markdown(f"""
-            <div class="traffic-card {color_class}">
-                <div style="font-size: 2.2rem; color: #000;">{level}</div>
-                <div style="font-size: 1rem; font-weight: bold; color: #000;">Traffic Level</div>
+            <div style='background:#f0f4f8; padding:1rem; border-radius:10px; border:1px solid #d0d8e0; text-align:center;'>
+                <div style='color:#1e3c72; font-size:0.9rem; font-weight:600;'>🚗 Predicted Vehicle Count</div>
+                <div style='color:#000000; font-size:2.2rem; font-weight:700;'>{pred_count} vehicles</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with m2:
+            st.markdown(f"""
+            <div style='background:#f0f4f8; padding:1rem; border-radius:10px; border:1px solid #d0d8e0; text-align:center;'>
+                <div style='color:#1e3c72; font-size:0.9rem; font-weight:600;'>📏 Estimated Avg. Speed</div>
+                <div style='color:#000000; font-size:2.2rem; font-weight:700;'>{speed} km/h</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with m3:
+            bg_color = "#ffcccc" if "HIGH" in level else "#ffe5b4" if "MEDIUM" in level else "#d4edda"
+            st.markdown(f"""
+            <div style='background:{bg_color}; padding:1rem; border-radius:10px; border-left:8px solid {"#dc3545" if "HIGH" in level else "#fd7e14" if "MEDIUM" in level else "#28a745"}; text-align:center;'>
+                <div style='color:#000000; font-size:2.2rem; font-weight:700;'>{level}</div>
+                <div style='color:#000000; font-size:1rem; font-weight:600;'>Traffic Level</div>
             </div>
             """, unsafe_allow_html=True)
 
-        # --- FIXED: Darker background for congestion message ---
+        # --- FIXED: Expected Congestion with STRONG inline styles ---
         st.markdown(f"""
-        <div style="background: #d4dce4; padding: 1rem; border-radius: 10px; margin: 1rem 0; color: #000000; border: 1px solid #8a9aa8; font-weight: 600;">
-            ⏳ Expected Congestion: {congestion}
+        <div style='
+            background: #d4dce4; 
+            padding: 1rem; 
+            border-radius: 10px; 
+            margin: 1rem 0; 
+            border: 2px solid #6a7a8a; 
+            text-align: center;
+        '>
+            <span style='color:#000000; font-size:1.2rem; font-weight:700;'>
+                ⏳ Expected Congestion: <span style='color:#1e3c72;'>{congestion}</span>
+            </span>
         </div>
         """, unsafe_allow_html=True)
 

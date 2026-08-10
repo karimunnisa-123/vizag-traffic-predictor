@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (FINAL - Inline Styles for Guaranteed Visibility)
+# app.py - Vizag Traffic Predictor (NEON BUTTON + VISIBLE HEADINGS)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,10 +13,18 @@ from sklearn.ensemble import RandomForestRegressor
 
 st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
 
-# --- MINIMAL CSS (Only for backgrounds, no text color overrides) ---
+# --- CSS: NEON BUTTON + VISIBLE HEADINGS + CLEAN UI ---
 st.markdown("""
 <style>
     .stApp { background-color: #ffffff; }
+    
+    /* HEADERS & SUBHEADERS - FORCED VISIBLE */
+    h1, h2, h3, .stSubheader {
+        color: #1e3c72 !important;
+        font-weight: 700 !important;
+    }
+    
+    /* MAIN HEADER (Blue Gradient) */
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -25,6 +33,10 @@ st.markdown("""
         color: white;
         margin-bottom: 2rem;
     }
+    .main-header h1 { color: white !important; }
+    .main-header p { color: white !important; }
+    
+    /* TRAFFIC CARDS */
     .traffic-card {
         padding: 1rem;
         border-radius: 15px;
@@ -35,6 +47,29 @@ st.markdown("""
     .high-risk { background-color: #ffcccc; border-left: 8px solid #dc3545; }
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
+    
+    /* --- NEON BUTTON STYLES --- */
+    div.stButton > button {
+        background-color: #00ffcc !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        font-size: 1.2rem !important;
+        border: 2px solid #00ffcc !important;
+        border-radius: 30px !important;
+        padding: 0.6rem 2rem !important;
+        box-shadow: 0 0 10px #00ffcc, 0 0 30px #00ffcc, 0 0 60px #00ffcc !important;
+        transition: all 0.3s ease !important;
+        width: 100% !important;
+    }
+    div.stButton > button:hover {
+        background-color: #00e6b8 !important;
+        box-shadow: 0 0 15px #00ffcc, 0 0 45px #00ffcc, 0 0 80px #00ffcc !important;
+        transform: scale(1.02) !important;
+        border-color: #00e6b8 !important;
+    }
+    div.stButton > button:active {
+        transform: scale(0.98) !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -158,8 +193,10 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ---------- INPUTS ----------
-st.subheader("📍 Select Location, Date & Time")
+# ---------- INPUTS (Using custom HTML to force visibility) ----------
+
+# --- Heading 1 ---
+st.markdown("<h3 style='color:#1e3c72; font-weight:700;'>📍 Select Location, Date & Time</h3>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
@@ -182,7 +219,8 @@ with col3:
     st.caption(f"✅ Selected Time: {hour_12:02d}:{minute:02d} {am_pm}")
     time_display = f"{hour_12:02d}:{minute:02d} {am_pm}"
 
-st.subheader("🌦️ Weather & Historical Traffic")
+# --- Heading 2 ---
+st.markdown("<h3 style='color:#1e3c72; font-weight:700;'>🌦️ Weather & Historical Traffic</h3>", unsafe_allow_html=True)
 col4, col5, col6, col7 = st.columns(4, gap="large")
 
 temperature = col4.slider("🌡️ Temperature (°C)", 20, 40, 30)
@@ -193,8 +231,9 @@ prev_hour_traffic = col7.number_input("🔄 Traffic (2 hours ago)", min_value=50
 is_holiday = st.checkbox("🏖️ Is today a Public Holiday?")
 st.markdown("---")
 
-# ---------- PREDICTION ----------
-if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary"):
+# ---------- PREDICTION (With NEON BUTTON) ----------
+# The button is styled via CSS now, no changes needed here except removing type="primary" to let custom CSS shine, but keeping it won't hurt.
+if st.button("🔮 Predict Traffic Now", use_container_width=True):
     with st.spinner("🔍 Analyzing real-time Vizag traffic patterns..."):
         loc_encoded = encoders['Location'].transform([location])[0]
         day_encoded = encoders['Day'].transform([day])[0]
@@ -217,8 +256,8 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
 
         st.markdown("---")
         
-        # --- PREDICTION RESULTS WITH INLINE STYLES (Guaranteed Visibility) ---
-        st.markdown("<h3 style='color:#1e3c72; font-weight:600;'>📊 Prediction Results</h3>", unsafe_allow_html=True)
+        # --- PREDICTION RESULTS ---
+        st.markdown("<h3 style='color:#1e3c72; font-weight:700;'>📊 Prediction Results</h3>", unsafe_allow_html=True)
         
         m1, m2, m3 = st.columns(3)
         with m1: 
@@ -246,7 +285,7 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
             </div>
             """, unsafe_allow_html=True)
 
-        # --- FIXED: Expected Congestion with STRONG inline styles ---
+        # --- Expected Congestion (Visible) ---
         st.markdown(f"""
         <div style='
             background: #d4dce4; 
@@ -262,7 +301,7 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
         </div>
         """, unsafe_allow_html=True)
 
-        st.subheader("📋 Detailed Location Report")
+        st.markdown("<h3 style='color:#1e3c72; font-weight:700;'>📋 Detailed Location Report</h3>", unsafe_allow_html=True)
         result_df = pd.DataFrame([{
             "City": "Visakhapatnam", "Location": location, "Date": date.strftime('%d-%m-%Y'),
             "Time": time_display, "Day": day, "Vehicle count": pred_count,

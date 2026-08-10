@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (FINAL - No BarColumn, Gauge Works!)
+# app.py - Vizag Traffic Predictor (FINAL - Fixed White Text Issue)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,10 +13,28 @@ from sklearn.ensemble import RandomForestRegressor
 
 st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
 
-# --- CSS ---
+# --- CSS (FORCES ALL TEXT TO BE VISIBLE ON WHITE BACKGROUND) ---
 st.markdown("""
 <style>
-    .stApp { background-color: #ffffff; }
+    .stApp { 
+        background-color: #ffffff; 
+        color: #000000; 
+    }
+    /* Force all containers to have black text */
+    .st-bb, .st-at, .st-cb, .st-dc, .st-bx, .st-ae, .st-af, .st-ag { 
+        background-color: #ffffff; 
+        color: #000000; 
+    }
+    /* Force labels to be dark blue and bold */
+    .stSlider label, .stNumberInput label, .stSelectbox label, .stRadio label {
+        color: #1e3c72 !important;
+        font-weight: 500 !important;
+    }
+    /* Force input text and numbers to be black */
+    input, .st-bw, .st-ay, .st-az, .st-bo { 
+        color: #000000 !important; 
+    }
+    /* Keep header text white (blue background) */
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -35,6 +53,10 @@ st.markdown("""
     .high-risk { background-color: #ffcccc; border-left: 8px solid #dc3545; }
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
+    /* Make sure captions and info text are dark */
+    .st-caption, .st-info {
+        color: #000000 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -223,13 +245,13 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
         with m3:
             st.markdown(f"""
             <div class="traffic-card {color_class}">
-                <div style="font-size: 2.2rem;">{level}</div>
-                <div style="font-size: 1rem; font-weight: bold;">Traffic Level</div>
+                <div style="font-size: 2.2rem; color: #000;">{level}</div>
+                <div style="font-size: 1rem; font-weight: bold; color: #000;">Traffic Level</div>
             </div>
             """, unsafe_allow_html=True)
 
         st.markdown(f"""
-        <div style="background: #e9ecef; padding: 1rem; border-radius: 10px; margin: 1rem 0;">
+        <div style="background: #e9ecef; padding: 1rem; border-radius: 10px; margin: 1rem 0; color: #000;">
             <b>⏳ Expected Congestion:</b> {congestion}
         </div>
         """, unsafe_allow_html=True)
@@ -244,10 +266,9 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
             "Traffic (1 hour ago)": prev_traffic, "Traffic (2 hours ago)": prev_hour_traffic
         }])
 
-        # ✅ FIX: Simple table - NO BarColumn (removes the error, allows gauge to load!)
         st.dataframe(result_df, use_container_width=True, hide_index=True)
 
-        # ---------- THE GAUGE (METER) - THIS WILL NOW WORK! ----------
+        # --- THE GAUGE (METER) ---
         fig = go.Figure(go.Indicator(
             mode="gauge+number", value=pred_count, domain={'x': [0, 1], 'y': [0, 1]},
             title={'text': "🚦 Traffic Volume Gauge"},

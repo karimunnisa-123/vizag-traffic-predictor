@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (REAL GOOGLE MAPS EMBED)
+# app.py - Vizag Traffic Predictor (NUCLEAR AM/PM FIX + REAL MAP)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -19,7 +19,7 @@ st.set_page_config(
     menu_items=None
 )
 
-# --- CSS: LIGHT MODE & BLACK TEXT ---
+# --- CSS: LIGHT MODE + NUCLEAR AM/PM FIX ---
 st.markdown("""
 <style>
     .stApp { background-color: #ffffff !important; }
@@ -28,12 +28,34 @@ st.markdown("""
         background-color: #ffffff !important;
     }
     h1, h2, h3, h4, .stSubheader { color: #000000 !important; font-weight: 700 !important; }
-    .stSelectbox label, .stNumberInput label, .stSlider label, .stDateInput label, .stCheckbox label, .stRadio label {
+    .stSelectbox label, .stNumberInput label, .stSlider label, .stDateInput label, .stCheckbox label {
         color: #000000 !important;
         font-weight: 600 !important;
     }
-    .stRadio > div[role="radiogroup"] label { color: #000000 !important; }
-    .stRadio > div[role="radiogroup"] label span { color: #000000 !important; }
+    
+    /* === NUCLEAR AM/PM FIX === */
+    .stRadio div[role="radiogroup"] label,
+    .stRadio div[role="radiogroup"] span,
+    .stRadio div[role="radiogroup"] div,
+    .stRadio div[role="radiogroup"] p,
+    .stRadio label,
+    .stRadio span,
+    .stRadio div,
+    .stRadio p,
+    div[role="radiogroup"] label,
+    div[role="radiogroup"] span,
+    label span {
+        color: #000000 !important;
+        font-weight: 600 !important;
+    }
+    /* Radio button circles (keep default or black) */
+    .stRadio div[role="radiogroup"] label div {
+        border-color: #555 !important;
+    }
+    .stRadio div[role="radiogroup"] label[data-checked="true"] div {
+        border-color: #1e3c72 !important;
+    }
+
     .stCaption, .st-caption { color: #000000 !important; font-weight: 500 !important; }
     .main-header {
         text-align: center;
@@ -73,7 +95,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- DATA GENERATION ---
+# ---------- DATA GENERATION ----------
 def generate_vizag_data():
     locations = {
         "Gajuwaka": 450, "NAD Junction": 420, "Maddilapalem": 380,
@@ -136,7 +158,7 @@ def generate_vizag_data():
     df.to_csv('vizag_traffic.csv', index=False)
     return df
 
-# --- MODEL TRAINING ---
+# ---------- MODEL TRAINING ----------
 def train_vizag_model():
     df = pd.read_csv('vizag_traffic.csv')
     features = ['Location', 'Hour', 'Day', 'Is_Weekend', 'Is_Holiday', 
@@ -232,12 +254,9 @@ with col3:
     time_display = f"{hour_12:02d}:{minute:02d} {am_pm}"
 
 # ==========================================
-# 🗺️  THE "REAL" GOOGLE MAPS EMBED
+# 🗺️  REAL GOOGLE MAPS EMBED
 # ==========================================
-# Get coordinates for the selected location
 lat, lon = vizag_locations[location]
-
-# This creates a live Google Maps iframe exactly like the app!
 google_maps_src = f"https://maps.google.com/maps?q={lat},{lon}&z=15&output=embed&hl=en"
 
 embed_html = f"""

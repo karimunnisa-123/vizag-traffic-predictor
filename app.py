@@ -188,10 +188,10 @@ with col3:
 
 st.subheader("🌦️ Weather & Historical Traffic")
 col4, col5, col6, col7 = st.columns(4, gap="large")
-with col4: temperature = st.slider("🌡️ Temperature (°C)", 20, 40, 30, use_container_width=True)
-with col5: rainfall = st.slider("🌧️ Rainfall (mm)", 0.0, 50.0, 5.0, step=0.5, use_container_width=True)
-with col6: prev_traffic = st.number_input("🚗 Traffic (1 hour ago)", min_value=50, max_value=1200, value=400, use_container_width=True)
-with col7: prev_hour_traffic = st.number_input("🔄 Traffic (2 hours ago)", min_value=50, max_value=1200, value=380, use_container_width=True)
+temperature = col4.slider("🌡️ Temperature (°C)", 20, 40, 30)
+rainfall = col5.slider("🌧️ Rainfall (mm)", 0.0, 50.0, 5.0, step=0.5)
+prev_traffic = col6.number_input("🚗 Traffic (1 hour ago)", min_value=50, max_value=1200, value=400)
+prev_hour_traffic = col7.number_input("🔄 Traffic (2 hours ago)", min_value=50, max_value=1200, value=380)
 
 is_holiday = st.checkbox("🏖️ Is today a Public Holiday?")
 st.markdown("---")

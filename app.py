@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (FINAL - Fixed White Text Issue)
+# app.py - Vizag Traffic Predictor (FINAL - Fixed Input Field Colors)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,28 +13,62 @@ from sklearn.ensemble import RandomForestRegressor
 
 st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
 
-# --- CSS (FORCES ALL TEXT TO BE VISIBLE ON WHITE BACKGROUND) ---
+# --- CSS (FORCES ALL INPUT FIELDS TO WHITE WITH BLACK TEXT) ---
 st.markdown("""
 <style>
     .stApp { 
         background-color: #ffffff; 
         color: #000000; 
     }
-    /* Force all containers to have black text */
-    .st-bb, .st-at, .st-cb, .st-dc, .st-bx, .st-ae, .st-af, .st-ag { 
-        background-color: #ffffff; 
-        color: #000000; 
+    /* Force all input backgrounds to be white */
+    .stSelectbox > div[data-baseweb="select"] > div,
+    .stNumberInput > div > div > input,
+    .stDateInput > div > div > input,
+    .stTextInput > div > div > input {
+        background-color: #ffffff !important;
+        color: #000000 !important;
     }
-    /* Force labels to be dark blue and bold */
+    /* Force dropdown menu background to white */
+    div[data-baseweb="popover"] > div {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    /* Force selectbox labels and values */
+    .stSelectbox label, .stSelectbox div[data-baseweb="select"] {
+        color: #000000 !important;
+    }
+    /* Number input arrows and buttons */
+    .stNumberInput button {
+        background-color: #e0e0e0 !important;
+        color: #000000 !important;
+    }
+    /* Slider background */
+    .stSlider > div > div > div > div {
+        background-color: #f0f0f0 !important;
+    }
+    /* Radio buttons background */
+    .stRadio > div {
+        background-color: transparent !important;
+    }
+    /* Checkbox label */
+    .stCheckbox > label {
+        color: #000000 !important;
+    }
+    /* Force all labels and captions to be black/dark blue */
     .stSlider label, .stNumberInput label, .stSelectbox label, .stRadio label {
         color: #1e3c72 !important;
         font-weight: 500 !important;
     }
-    /* Force input text and numbers to be black */
-    input, .st-bw, .st-ay, .st-az, .st-bo { 
+    /* Force all text in input areas to be black */
+    input, .st-bw, .st-ay, .st-az, .st-bo, .st-dd {
+        color: #000000 !important;
+    }
+    /* Force containers to have white background */
+    .st-bb, .st-at, .st-cb, .st-dc, .st-bx, .st-ae, .st-af, .st-ag { 
+        background-color: #ffffff !important;
         color: #000000 !important; 
     }
-    /* Keep header text white (blue background) */
+    /* Header stays blue with white text */
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -43,6 +77,7 @@ st.markdown("""
         color: white;
         margin-bottom: 2rem;
     }
+    /* Traffic Cards */
     .traffic-card {
         padding: 1rem;
         border-radius: 15px;

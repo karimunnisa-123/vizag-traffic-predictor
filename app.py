@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (CLEAN BUTTON + VISIBLE HEADINGS)
+# app.py - Vizag Traffic Predictor (FINAL - MATCHES SCREENSHOT)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,18 +13,10 @@ from sklearn.ensemble import RandomForestRegressor
 
 st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
 
-# --- CSS: CLEAN BUTTON + VISIBLE HEADINGS ---
+# --- MINIMAL CSS: Only Header and Traffic Cards ---
 st.markdown("""
 <style>
     .stApp { background-color: #ffffff; }
-    
-    /* HEADERS & SUBHEADERS - FORCED VISIBLE */
-    h1, h2, h3, .stSubheader {
-        color: #1e3c72 !important;
-        font-weight: 700 !important;
-    }
-    
-    /* MAIN HEADER (Blue Gradient) */
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -33,10 +25,6 @@ st.markdown("""
         color: white;
         margin-bottom: 2rem;
     }
-    .main-header h1 { color: white !important; }
-    .main-header p { color: white !important; }
-    
-    /* TRAFFIC CARDS */
     .traffic-card {
         padding: 1rem;
         border-radius: 15px;
@@ -47,28 +35,6 @@ st.markdown("""
     .high-risk { background-color: #ffcccc; border-left: 8px solid #dc3545; }
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
-    
-    /* --- CLEAN PREDICT BUTTON (No Neon) --- */
-    div.stButton > button {
-        background: linear-gradient(90deg, #1e3c72, #2a5298) !important;
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        font-size: 1.2rem !important;
-        border: none !important;
-        border-radius: 30px !important;
-        padding: 0.7rem 2rem !important;
-        transition: all 0.3s ease !important;
-        width: 100% !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
-    }
-    div.stButton > button:hover {
-        background: linear-gradient(90deg, #2a5298, #1e3c72) !important;
-        transform: scale(1.02) !important;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.3) !important;
-    }
-    div.stButton > button:active {
-        transform: scale(0.98) !important;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -192,22 +158,21 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ---------- INPUTS (Using custom HTML for visible headings) ----------
-
-# --- Heading 1 ---
-st.markdown("<h3 style='color:#1e3c72; font-weight:700;'>📍 Select Location, Date & Time</h3>", unsafe_allow_html=True)
+# ---------- INPUT SECTION (EXACTLY AS IN SCREENSHOT) ----------
+st.subheader("📍 Select Location, Date & Time")
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
-    location = st.selectbox("Location", ["Gajuwaka", "NAD Junction", "Maddilapalem", "Siripuram", 
-                                          "MVP Colony", "Dwaraka Nagar", "RTC Complex", 
-                                          "Jagadamba Junction", "Akkayyapalem", "Madhurawada"])
+    location = st.selectbox("📍 Location", ["Gajuwaka", "NAD Junction", "Maddilapalem", "Siripuram", 
+                                             "MVP Colony", "Dwaraka Nagar", "RTC Complex", 
+                                             "Jagadamba Junction", "Akkayyapalem", "Madhurawada"])
 with col2:
-    date = st.date_input("Date", datetime.now())
+    date = st.date_input("📅 Date", datetime.now())
     day = date.strftime('%A')
-    st.caption(f"Detected Day: **{day}**")
+    st.caption(f"📅 Detected Day: **{day}**")
+
 with col3:
-    st.write("Select Time")
+    st.write("⏰ Select Time")
     time_col1, time_col2, time_col3 = st.columns(3, gap="small")
     with time_col1: hour_12 = st.selectbox("Hour", list(range(1, 13)), index=8)
     with time_col2: minute = st.selectbox("Min", [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], index=0)
@@ -215,23 +180,26 @@ with col3:
     if am_pm == "PM" and hour_12 != 12: hour = hour_12 + 12
     elif am_pm == "AM" and hour_12 == 12: hour = 0
     else: hour = hour_12
-    st.caption(f"Selected Time: {hour_12:02d}:{minute:02d} {am_pm}")
+    st.caption(f"✅ Selected Time: {hour_12:02d}:{minute:02d} {am_pm}")
     time_display = f"{hour_12:02d}:{minute:02d} {am_pm}"
 
-# --- Heading 2 ---
-st.markdown("<h3 style='color:#1e3c72; font-weight:700;'>🌦️ Weather & Historical Traffic</h3>", unsafe_allow_html=True)
+st.subheader("🌦️ Weather & Historical Traffic")
 col4, col5, col6, col7 = st.columns(4, gap="large")
 
-temperature = col4.slider("Temperature (°C)", 20, 40, 30)
-rainfall = col5.slider("Rainfall (mm)", 0.0, 50.0, 5.0, step=0.5)
-prev_traffic = col6.number_input("Traffic (1 hour ago)", min_value=50, max_value=1200, value=400)
-prev_hour_traffic = col7.number_input("Traffic (2 hours ago)", min_value=50, max_value=1200, value=380)
+with col4: 
+    temperature = st.slider("🌡️ Temperature (°C)", 20, 40, 30)
+with col5: 
+    rainfall = st.slider("🌧️ Rainfall (mm)", 0.0, 50.0, 5.0, step=0.5)
+with col6: 
+    prev_traffic = st.number_input("🚗 Traffic (1 hour ago)", min_value=50, max_value=1200, value=400)
+with col7: 
+    prev_hour_traffic = st.number_input("🔄 Traffic (2 hours ago)", min_value=50, max_value=1200, value=380)
 
-is_holiday = st.checkbox("Is today a Public Holiday?")
+is_holiday = st.checkbox("🏖️ Is today a Public Holiday?")
 st.markdown("---")
 
-# ---------- PREDICTION (Clean Button) ----------
-if st.button("🔮 Predict Traffic Now", use_container_width=True):
+# ---------- PREDICTION ----------
+if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary"):
     with st.spinner("🔍 Analyzing real-time Vizag traffic patterns..."):
         loc_encoded = encoders['Location'].transform([location])[0]
         day_encoded = encoders['Day'].transform([day])[0]
@@ -253,53 +221,28 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True):
         speed = max(5, round(speed - rainfall * 0.3, 1))
 
         st.markdown("---")
-        
-        # --- PREDICTION RESULTS ---
-        st.markdown("<h3 style='color:#1e3c72; font-weight:700;'>📊 Prediction Results</h3>", unsafe_allow_html=True)
+        st.subheader("📊 Prediction Results")
         
         m1, m2, m3 = st.columns(3)
         with m1: 
-            st.markdown(f"""
-            <div style='background:#f0f4f8; padding:1rem; border-radius:10px; border:1px solid #d0d8e0; text-align:center;'>
-                <div style='color:#1e3c72; font-size:0.9rem; font-weight:600;'>🚗 Predicted Vehicle Count</div>
-                <div style='color:#000000; font-size:2.2rem; font-weight:700;'>{pred_count} vehicles</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with m2:
-            st.markdown(f"""
-            <div style='background:#f0f4f8; padding:1rem; border-radius:10px; border:1px solid #d0d8e0; text-align:center;'>
-                <div style='color:#1e3c72; font-size:0.9rem; font-weight:600;'>📏 Estimated Avg. Speed</div>
-                <div style='color:#000000; font-size:2.2rem; font-weight:700;'>{speed} km/h</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
+            st.metric("🚗 Predicted Vehicle Count", f"{pred_count} vehicles")
+        with m2: 
+            st.metric("📏 Estimated Avg. Speed", f"{speed} km/h")
         with m3:
-            bg_color = "#ffcccc" if "HIGH" in level else "#ffe5b4" if "MEDIUM" in level else "#d4edda"
             st.markdown(f"""
-            <div style='background:{bg_color}; padding:1rem; border-radius:10px; border-left:8px solid {"#dc3545" if "HIGH" in level else "#fd7e14" if "MEDIUM" in level else "#28a745"}; text-align:center;'>
-                <div style='color:#000000; font-size:2.2rem; font-weight:700;'>{level}</div>
-                <div style='color:#000000; font-size:1rem; font-weight:600;'>Traffic Level</div>
+            <div class="traffic-card {color_class}">
+                <div style="font-size: 2.2rem; color: #000;">{level}</div>
+                <div style="font-size: 1rem; font-weight: bold; color: #000;">Traffic Level</div>
             </div>
             """, unsafe_allow_html=True)
 
-        # --- Expected Congestion ---
         st.markdown(f"""
-        <div style='
-            background: #d4dce4; 
-            padding: 1rem; 
-            border-radius: 10px; 
-            margin: 1rem 0; 
-            border: 2px solid #6a7a8a; 
-            text-align: center;
-        '>
-            <span style='color:#000000; font-size:1.2rem; font-weight:700;'>
-                ⏳ Expected Congestion: <span style='color:#1e3c72;'>{congestion}</span>
-            </span>
+        <div style="background: #e9ecef; padding: 1rem; border-radius: 10px; margin: 1rem 0; color: #000;">
+            <b>⏳ Expected Congestion:</b> {congestion}
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("<h3 style='color:#1e3c72; font-weight:700;'>📋 Detailed Location Report</h3>", unsafe_allow_html=True)
+        st.subheader("📋 Detailed Location Report")
         result_df = pd.DataFrame([{
             "City": "Visakhapatnam", "Location": location, "Date": date.strftime('%d-%m-%Y'),
             "Time": time_display, "Day": day, "Vehicle count": pred_count,
@@ -311,7 +254,7 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True):
 
         st.dataframe(result_df, use_container_width=True, hide_index=True)
 
-        # --- THE GAUGE (METER) ---
+        # --- GAUGE (METER) ---
         fig = go.Figure(go.Indicator(
             mode="gauge+number", value=pred_count, domain={'x': [0, 1], 'y': [0, 1]},
             title={'text': "🚦 Traffic Volume Gauge"},

@@ -13,16 +13,10 @@ from sklearn.ensemble import RandomForestRegressor
 
 st.set_page_config(page_title="🚦 Vizag Traffic Predictor", page_icon="🚦", layout="wide")
 
-# --- CSS: FORCES EVERYTHING TO BE VISIBLE ON WHITE BACKGROUND ---
+# --- CSS: FORCES EVERYTHING TO BE VISIBLE ---
 st.markdown("""
 <style>
-    /* Main app background */
-    .stApp { 
-        background-color: #ffffff !important; 
-        color: #000000 !important; 
-    }
-    
-    /* ALL containers - white background, black text */
+    .stApp { background-color: #ffffff !important; color: #000000 !important; }
     .st-bb, .st-at, .st-cb, .st-dc, .st-bx, .st-ae, .st-af, .st-ag, 
     .st-be, .st-bf, .st-bg, .st-bh, .st-bi, .st-bj, .st-bk, .st-bl,
     .st-bm, .st-bn, .st-bo, .st-bp, .st-bq, .st-br, .st-bs, .st-bt,
@@ -31,71 +25,31 @@ st.markdown("""
         background-color: #ffffff !important;
         color: #000000 !important;
     }
-    
-    /* --- INPUT FIELDS --- */
-    /* Selectbox (Location) */
     .stSelectbox > div[data-baseweb="select"] > div,
     .stSelectbox > div > div {
         background-color: #ffffff !important;
         color: #000000 !important;
         border: 1px solid #ccc !important;
     }
-    .stSelectbox label {
-        color: #1e3c72 !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
-    }
-    
-    /* Number Inputs (Traffic hours) */
+    .stSelectbox label { color: #1e3c72 !important; font-weight: 600 !important; }
     .stNumberInput > div > div > input,
     .stNumberInput > div > div {
         background-color: #ffffff !important;
         color: #000000 !important;
         border: 1px solid #ccc !important;
     }
-    .stNumberInput label {
-        color: #1e3c72 !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
-    }
-    
-    /* Date Input */
+    .stNumberInput label { color: #1e3c72 !important; font-weight: 600 !important; }
     .stDateInput > div > div > input {
         background-color: #ffffff !important;
         color: #000000 !important;
         border: 1px solid #ccc !important;
     }
-    .stDateInput label {
-        color: #1e3c72 !important;
-        font-weight: 600 !important;
-    }
-    
-    /* Sliders */
-    .stSlider label {
-        color: #1e3c72 !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
-    }
-    .stSlider > div > div > div > div {
-        background-color: #2a5298 !important;
-    }
-    
-    /* Radio Buttons (AM/PM) */
-    .stRadio label {
-        color: #000000 !important;
-        font-weight: 500 !important;
-    }
-    .stRadio > div {
-        background-color: transparent !important;
-    }
-    
-    /* Checkbox */
-    .stCheckbox label {
-        color: #1e3c72 !important;
-        font-weight: 500 !important;
-    }
-    
-    /* --- METRICS (Vehicle Count, Speed) --- */
+    .stDateInput label { color: #1e3c72 !important; font-weight: 600 !important; }
+    .stSlider label { color: #1e3c72 !important; font-weight: 600 !important; }
+    .stSlider > div > div > div > div { background-color: #2a5298 !important; }
+    .stRadio label { color: #000000 !important; font-weight: 500 !important; }
+    .stRadio > div { background-color: transparent !important; }
+    .stCheckbox label { color: #1e3c72 !important; font-weight: 500 !important; }
     div[data-testid="metric-container"] {
         background-color: #f0f4f8 !important;
         border-radius: 10px !important;
@@ -111,11 +65,6 @@ st.markdown("""
         font-weight: 700 !important;
         font-size: 2rem !important;
     }
-    div[data-testid="metric-container"] div[data-testid="metric-delta"] {
-        color: #1e3c72 !important;
-    }
-    
-    /* --- HEADER (Blue background, white text) --- */
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -124,14 +73,8 @@ st.markdown("""
         color: white;
         margin-bottom: 2rem;
     }
-    .main-header h1 {
-        color: white !important;
-    }
-    .main-header p {
-        color: white !important;
-    }
-    
-    /* --- TRAFFIC CARDS --- */
+    .main-header h1 { color: white !important; }
+    .main-header p { color: white !important; }
     .traffic-card {
         padding: 1rem;
         border-radius: 15px;
@@ -142,51 +85,24 @@ st.markdown("""
     .high-risk { background-color: #ffcccc; border-left: 8px solid #dc3545; }
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
-    
-    /* --- SUBHEADERS & CAPTIONS --- */
-    .stSubheader, .stCaption {
-        color: #1e3c72 !important;
-    }
-    .stSubheader {
-        font-weight: 600 !important;
-    }
-    .st-caption {
-        color: #000000 !important;
-    }
-    
-    /* --- DATA FRAME (Table) --- */
-    div[data-testid="stDataFrame"] {
-        background-color: #ffffff !important;
-    }
-    div[data-testid="stDataFrame"] table {
-        color: #000000 !important;
-    }
+    .stSubheader, .stCaption { color: #1e3c72 !important; }
+    .stSubheader { font-weight: 600 !important; }
+    .st-caption { color: #000000 !important; }
+    div[data-testid="stDataFrame"] { background-color: #ffffff !important; }
+    div[data-testid="stDataFrame"] table { color: #000000 !important; }
     div[data-testid="stDataFrame"] th {
         background-color: #e8edf3 !important;
         color: #1e3c72 !important;
         font-weight: 600 !important;
     }
-    div[data-testid="stDataFrame"] td {
-        color: #000000 !important;
-    }
-    
-    /* --- INFO BOX (before prediction) --- */
-    .stAlert {
-        background-color: #e3f0fa !important;
-        color: #000000 !important;
-    }
-    
-    /* --- DROPDOWN MENU ITEMS --- */
+    div[data-testid="stDataFrame"] td { color: #000000 !important; }
+    .stAlert { background-color: #e3f0fa !important; color: #000000 !important; }
     div[data-baseweb="popover"] > div {
         background-color: #ffffff !important;
         color: #000000 !important;
     }
-    div[data-baseweb="popover"] li {
-        color: #000000 !important;
-    }
-    div[data-baseweb="popover"] li:hover {
-        background-color: #e0e8f0 !important;
-    }
+    div[data-baseweb="popover"] li { color: #000000 !important; }
+    div[data-baseweb="popover"] li:hover { background-color: #e0e8f0 !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -380,9 +296,10 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
             </div>
             """, unsafe_allow_html=True)
 
+        # --- FIXED: Darker background for congestion message ---
         st.markdown(f"""
-        <div style="background: #e9ecef; padding: 1rem; border-radius: 10px; margin: 1rem 0; color: #000;">
-            <b>⏳ Expected Congestion:</b> {congestion}
+        <div style="background: #d4dce4; padding: 1rem; border-radius: 10px; margin: 1rem 0; color: #000000; border: 1px solid #8a9aa8; font-weight: 600;">
+            ⏳ Expected Congestion: {congestion}
         </div>
         """, unsafe_allow_html=True)
 

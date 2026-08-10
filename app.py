@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (SELF-CONTAINED - NO SUBPROCESS)
+# app.py - Vizag Traffic Predictor (FINAL - No BarColumn, Gauge Works!)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -38,7 +38,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- DATA GENERATION (Built-in) ----------
+# ---------- DATA GENERATION ----------
 def generate_vizag_data():
     locations = {
         "Gajuwaka": 450, "NAD Junction": 420, "Maddilapalem": 380,
@@ -101,7 +101,7 @@ def generate_vizag_data():
     df.to_csv('vizag_traffic.csv', index=False)
     return df
 
-# ---------- MODEL TRAINING (Built-in) ----------
+# ---------- MODEL TRAINING ----------
 def train_vizag_model():
     df = pd.read_csv('vizag_traffic.csv')
     features = ['Location', 'Hour', 'Day', 'Is_Weekend', 'Is_Holiday', 
@@ -131,7 +131,7 @@ def train_vizag_model():
     pickle.dump(features, open('feature_names.pkl', 'wb'))
     return model
 
-# ---------- AUTO-BUILD (NO SUBPROCESS!) ----------
+# ---------- AUTO-BUILD (NO SUBPROCESS) ----------
 if not os.path.exists('traffic_model.pkl'):
     st.warning("⚙️ First time setup! Generating Vizag data and training model... (~2 minutes)")
     generate_vizag_data()
@@ -150,7 +150,7 @@ def load_models():
 
 model, scaler, encoders, features = load_models()
 
-# ---------- UI ----------
+# ---------- HEADER ----------
 st.markdown("""
 <div class="main-header">
     <h1>🚦 Location & Time-Based Traffic Congestion Prediction</h1>
@@ -158,6 +158,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ---------- INPUTS ----------
 st.subheader("📍 Select Location, Date & Time")
 col1, col2, col3 = st.columns(3, gap="large")
 
@@ -192,6 +193,7 @@ prev_hour_traffic = col7.number_input("🔄 Traffic (2 hours ago)", min_value=50
 is_holiday = st.checkbox("🏖️ Is today a Public Holiday?")
 st.markdown("---")
 
+# ---------- PREDICTION ----------
 if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary"):
     with st.spinner("🔍 Analyzing real-time Vizag traffic patterns..."):
         loc_encoded = encoders['Location'].transform([location])[0]
@@ -242,20 +244,10 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
             "Traffic (1 hour ago)": prev_traffic, "Traffic (2 hours ago)": prev_hour_traffic
         }])
 
-        st.dataframe(
-            result_df,
-            column_config={
-                "Vehicle count": st.column_config.BarColumn(
-                    "Vehicle Count",
-                    min_value=0,
-                    max_value=1000,
-                    width="medium",
-                )
-            },
-            use_container_width=True,
-            hide_index=True
-        )
+        # ✅ FIX: Simple table - NO BarColumn (removes the error, allows gauge to load!)
+        st.dataframe(result_df, use_container_width=True, hide_index=True)
 
+        # ---------- THE GAUGE (METER) - THIS WILL NOW WORK! ----------
         fig = go.Figure(go.Indicator(
             mode="gauge+number", value=pred_count, domain={'x': [0, 1], 'y': [0, 1]},
             title={'text': "🚦 Traffic Volume Gauge"},
@@ -265,7 +257,8 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
                              {'range': [700, 1000], 'color': "salmon"}],
                    'threshold': {'line': {'color': "black", 'width': 4}, 'thickness': 0.75, 'value': pred_count}}
         ))
-        fig.update_layout(height=300)
+        fig.update_layout(height=350, margin=dict(l=20, r=20, t=50, b=20))
         st.plotly_chart(fig, use_container_width=True)
+
 else:
     st.info("👆 Adjust the inputs above and click **Predict** to see the traffic forecast!")

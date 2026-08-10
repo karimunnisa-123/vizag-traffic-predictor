@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (FORCED LIGHT MODE + BLACK AM/PM)
+# app.py - Vizag Traffic Predictor (WITH LIVE INTERACTIVE MAP)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -11,7 +11,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 
-# --- CRITICAL FIX: Force the app to use LIGHT THEME ---
+# --- NEW MAP LIBRARIES ---
+import folium
+from streamlit_folium import st_folium
+
 st.set_page_config(
     page_title="🚦 Vizag Traffic Predictor",
     page_icon="🚦",
@@ -20,70 +23,22 @@ st.set_page_config(
     menu_items=None
 )
 
-# --- CSS: BLOCK DARK MODE & FORCE BLACK AM/PM ---
+# --- CSS: FORCE LIGHT MODE & BLACK TEXT ---
 st.markdown("""
 <style>
-    /* 1. FORCE THE ENTIRE APP BACKGROUND TO WHITE */
-    .stApp {
-        background-color: #ffffff !important;
-    }
-    
-    /* 2. FORCE ALL BODY TEXT AND CONTAINERS TO BLACK */
+    .stApp { background-color: #ffffff !important; }
     html, body, .main, .st-bb, .st-at, .st-cb, .st-dc, .st-bx, .st-ae {
         color: #000000 !important;
         background-color: #ffffff !important;
     }
-    
-    /* 3. FORCE HEADINGS TO BLACK */
-    h1, h2, h3, h4, .stSubheader {
-        color: #000000 !important;
-        font-weight: 700 !important;
-    }
-    
-    /* 4. FORCE ALL WIDGET LABELS TO BLACK */
-    .stSelectbox label, .stNumberInput label, .stSlider label, 
-    .stDateInput label, .stCheckbox label, .stRadio label {
+    h1, h2, h3, h4, .stSubheader { color: #000000 !important; font-weight: 700 !important; }
+    .stSelectbox label, .stNumberInput label, .stSlider label, .stDateInput label, .stCheckbox label, .stRadio label {
         color: #000000 !important;
         font-weight: 600 !important;
     }
-    
-    /* 5. THE MEGA FIX: FORCE AM/PM RADIO TEXT TO BLACK */
-    .stRadio > div[role="radiogroup"] label {
-        color: #000000 !important;
-        font-weight: 600 !important;
-    }
-    .stRadio > div[role="radiogroup"] label span {
-        color: #000000 !important;
-    }
-    .stRadio > div[role="radiogroup"] label div {
-        color: #000000 !important;
-    }
-    .stRadio > div[role="radiogroup"] label p {
-        color: #000000 !important;
-    }
-    /* Target the checked/selected state */
-    .stRadio > div[role="radiogroup"] label[data-checked="true"] {
-        color: #000000 !important;
-    }
-    .stRadio > div[role="radiogroup"] label[data-checked="true"] span {
-        color: #000000 !important;
-    }
-    /* Target the radio circle parent */
-    .stRadio > div[role="radiogroup"] {
-        color: #000000 !important;
-    }
-    /* A final blanket override for the entire radio group */
-    .stRadio label {
-        color: #000000 !important;
-    }
-    
-    /* 6. CAPTIONS TO BLACK */
-    .stCaption, .st-caption {
-        color: #000000 !important;
-        font-weight: 500 !important;
-    }
-
-    /* 7. MAIN HEADER (BLUE GRADIENT) */
+    .stRadio > div[role="radiogroup"] label { color: #000000 !important; }
+    .stRadio > div[role="radiogroup"] label span { color: #000000 !important; }
+    .stCaption, .st-caption { color: #000000 !important; font-weight: 500 !important; }
     .main-header {
         text-align: center;
         padding: 1rem 0;
@@ -94,8 +49,6 @@ st.markdown("""
     }
     .main-header h1 { color: white !important; }
     .main-header p { color: white !important; }
-    
-    /* 8. TRAFFIC CARDS */
     .traffic-card {
         padding: 1rem;
         border-radius: 15px;
@@ -106,8 +59,6 @@ st.markdown("""
     .high-risk { background-color: #ffcccc; border-left: 8px solid #dc3545; }
     .medium-risk { background-color: #ffe5b4; border-left: 8px solid #fd7e14; }
     .low-risk { background-color: #d4edda; border-left: 8px solid #28a745; }
-    
-    /* 9. CLEAN PREDICT BUTTON */
     div.stButton > button {
         background: linear-gradient(90deg, #1e3c72, #2a5298) !important;
         color: #ffffff !important;
@@ -126,7 +77,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- DATA GENERATION ----------
+# --- DATA GENERATION ---
 def generate_vizag_data():
     locations = {
         "Gajuwaka": 450, "NAD Junction": 420, "Maddilapalem": 380,
@@ -189,7 +140,7 @@ def generate_vizag_data():
     df.to_csv('vizag_traffic.csv', index=False)
     return df
 
-# ---------- MODEL TRAINING ----------
+# --- MODEL TRAINING ---
 def train_vizag_model():
     df = pd.read_csv('vizag_traffic.csv')
     features = ['Location', 'Hour', 'Day', 'Is_Weekend', 'Is_Holiday', 
@@ -219,7 +170,7 @@ def train_vizag_model():
     pickle.dump(features, open('feature_names.pkl', 'wb'))
     return model
 
-# ---------- AUTO-BUILD ----------
+# --- AUTO-BUILD ---
 if not os.path.exists('traffic_model.pkl'):
     st.warning("⚙️ First time setup! Generating Vizag data and training model... (~2 minutes)")
     generate_vizag_data()
@@ -227,7 +178,7 @@ if not os.path.exists('traffic_model.pkl'):
     st.success("✅ Model ready! Refreshing...")
     st.rerun()
 
-# ---------- LOAD MODELS ----------
+# --- LOAD MODELS ---
 @st.cache_resource
 def load_models():
     model = pickle.load(open('traffic_model.pkl', 'rb'))
@@ -238,7 +189,23 @@ def load_models():
 
 model, scaler, encoders, features = load_models()
 
-# ---------- HEADER ----------
+# ==========================================
+# === 🗺️ VISAKHAPATNAM MAP COORDINATES ===
+# ==========================================
+vizag_locations = {
+    "Gajuwaka": [17.6745, 83.2104],
+    "NAD Junction": [17.7300, 83.2670],
+    "Maddilapalem": [17.7333, 83.3167],
+    "Siripuram": [17.7200, 83.3000],
+    "MVP Colony": [17.7500, 83.2500],
+    "Dwaraka Nagar": [17.7333, 83.3100],
+    "RTC Complex": [17.7000, 83.3000],
+    "Jagadamba Junction": [17.7133, 83.2833],
+    "Akkayyapalem": [17.6800, 83.2400],
+    "Madhurawada": [17.7700, 83.3500]
+}
+
+# --- HEADER ---
 st.markdown("""
 <div class="main-header">
     <h1>🚦 Location & Time-Based Traffic Congestion Prediction</h1>
@@ -246,14 +213,12 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ---------- INPUT SECTION ----------
+# --- INPUT SECTION ---
 st.subheader("📍 Select Location, Date & Time")
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
-    location = st.selectbox("Location", ["Gajuwaka", "NAD Junction", "Maddilapalem", "Siripuram", 
-                                          "MVP Colony", "Dwaraka Nagar", "RTC Complex", 
-                                          "Jagadamba Junction", "Akkayyapalem", "Madhurawada"])
+    location = st.selectbox("Location", list(vizag_locations.keys()))
 with col2:
     date = st.date_input("Date", datetime.now())
     day = date.strftime('%A')
@@ -270,6 +235,37 @@ with col3:
     st.caption(f"Selected Time: {hour_12:02d}:{minute:02d} {am_pm}")
     time_display = f"{hour_12:02d}:{minute:02d} {am_pm}"
 
+# ==========================================
+# 🗺️  DISPLAY THE LIVE MAP
+# ==========================================
+# Get coordinates for the selected location
+lat, lon = vizag_locations[location]
+
+# Create a Folium map centered on the selected location
+m = folium.Map(location=[lat, lon], zoom_start=14, tiles="OpenStreetMap")
+
+# Add a beautiful blue marker with a popup
+folium.Marker(
+    [lat, lon],
+    popup=f"<b>{location}</b><br>Vizag, Andhra Pradesh",
+    tooltip="Click to zoom",
+    icon=folium.Icon(color="blue", icon="info-sign")
+).add_to(m)
+
+# Add a circle around the location for better visibility
+folium.Circle(
+    radius=300,
+    location=[lat, lon],
+    color="blue",
+    fill=True,
+    fillOpacity=0.15
+).add_to(m)
+
+# Display the map in Streamlit
+st.caption(f"📍 Zooming into: {location}")
+st_folium(m, width=700, height=400, returned_objects=[])
+
+# --- WEATHER SECTION ---
 st.subheader("🌦️ Weather & Historical Traffic")
 col4, col5, col6, col7 = st.columns(4, gap="large")
 
@@ -285,7 +281,7 @@ with col7:
 is_holiday = st.checkbox("Is today a Public Holiday?")
 st.markdown("---")
 
-# ---------- PREDICTION ----------
+# --- PREDICTION ---
 if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary"):
     with st.spinner("🔍 Analyzing real-time Vizag traffic patterns..."):
         loc_encoded = encoders['Location'].transform([location])[0]
@@ -354,6 +350,7 @@ if st.button("🔮 Predict Traffic Now", use_container_width=True, type="primary
 
         st.dataframe(result_df, use_container_width=True, hide_index=True)
 
+        # --- GAUGE ---
         fig = go.Figure(go.Indicator(
             mode="gauge+number", value=pred_count, domain={'x': [0, 1], 'y': [0, 1]},
             title={'text': "🚦 Traffic Volume Gauge"},

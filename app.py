@@ -1,4 +1,4 @@
-# app.py - Vizag Traffic Predictor (WITH LIVE INTERACTIVE MAP)
+# app.py - Vizag Traffic Predictor (REAL GOOGLE MAPS EMBED)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -11,10 +11,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 
-# --- NEW MAP LIBRARIES ---
-import folium
-from streamlit_folium import st_folium
-
 st.set_page_config(
     page_title="🚦 Vizag Traffic Predictor",
     page_icon="🚦",
@@ -23,7 +19,7 @@ st.set_page_config(
     menu_items=None
 )
 
-# --- CSS: FORCE LIGHT MODE & BLACK TEXT ---
+# --- CSS: LIGHT MODE & BLACK TEXT ---
 st.markdown("""
 <style>
     .stApp { background-color: #ffffff !important; }
@@ -190,7 +186,7 @@ def load_models():
 model, scaler, encoders, features = load_models()
 
 # ==========================================
-# === 🗺️ VISAKHAPATNAM MAP COORDINATES ===
+# 🗺️ VISAKHAPATNAM MAP COORDINATES
 # ==========================================
 vizag_locations = {
     "Gajuwaka": [17.6745, 83.2104],
@@ -236,34 +232,28 @@ with col3:
     time_display = f"{hour_12:02d}:{minute:02d} {am_pm}"
 
 # ==========================================
-# 🗺️  DISPLAY THE LIVE MAP
+# 🗺️  THE "REAL" GOOGLE MAPS EMBED
 # ==========================================
 # Get coordinates for the selected location
 lat, lon = vizag_locations[location]
 
-# Create a Folium map centered on the selected location
-m = folium.Map(location=[lat, lon], zoom_start=14, tiles="OpenStreetMap")
+# This creates a live Google Maps iframe exactly like the app!
+google_maps_src = f"https://maps.google.com/maps?q={lat},{lon}&z=15&output=embed&hl=en"
 
-# Add a beautiful blue marker with a popup
-folium.Marker(
-    [lat, lon],
-    popup=f"<b>{location}</b><br>Vizag, Andhra Pradesh",
-    tooltip="Click to zoom",
-    icon=folium.Icon(color="blue", icon="info-sign")
-).add_to(m)
+embed_html = f"""
+    <iframe 
+        width="100%" 
+        height="400" 
+        frameborder="0" 
+        style="border:0; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" 
+        src="{google_maps_src}" 
+        allowfullscreen>
+    </iframe>
+    <p style="font-size: 0.8rem; color: #888; text-align: center;">📍 Live location: <b>{location}</b>, Visakhapatnam</p>
+"""
 
-# Add a circle around the location for better visibility
-folium.Circle(
-    radius=300,
-    location=[lat, lon],
-    color="blue",
-    fill=True,
-    fillOpacity=0.15
-).add_to(m)
-
-# Display the map in Streamlit
-st.caption(f"📍 Zooming into: {location}")
-st_folium(m, width=700, height=400, returned_objects=[])
+st.caption("📍 Live Map Location")
+st.components.v1.html(embed_html, height=470)
 
 # --- WEATHER SECTION ---
 st.subheader("🌦️ Weather & Historical Traffic")
